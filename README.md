@@ -18,7 +18,3 @@ In this repository, a relatively simple MLP is implemented to predict the MNIST 
 -- Install the `docker` command
 
 -- launch `docker build -t [name_image]` then `docker run [name_image]` (`[name_image]` being a name of your choice (as long as it is acceptable) that has to be used for both command lines.)
-
-
-
-
