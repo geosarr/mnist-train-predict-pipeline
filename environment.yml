@@ -80,4 +80,3 @@ dependencies:
     - typing-inspect==0.7.1
     - urllib3==1.26.9
     - uvicorn==0.18.2
-prefix: /home/georges_sarr/miniconda3/envs/mnist_env
