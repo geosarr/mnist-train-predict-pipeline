@@ -2,7 +2,7 @@ name: Mnist Training-Predicting Pipeline
 on: [push]
 jobs:
   build:
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
