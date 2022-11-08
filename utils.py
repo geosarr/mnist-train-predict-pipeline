@@ -26,10 +26,10 @@ def load_dataset(
 
     print("\n")
     print(" Loading training and validation sets ".center(100, "#"))
-
-    os.makedirs("./data", exist_ok=True)
+    data_dir = os.path.join(os.path.dirname(__file__), "data")
+    os.makedirs(data_dir, exist_ok=True)
     train_set = datasets.MNIST(
-        root="./data", train=True, download=True, transform=transforms.ToTensor()
+        root=data_dir, train=True, download=True, transform=transforms.ToTensor()
     )
 
     print(f"Number of training instances {n_train}")
@@ -80,6 +80,11 @@ def run_train(
     val_losses = []
     train_losses = []
     x_val, y_val = next(iter(val_loader))
+    base_dir = os.path.dirname(__file__)
+    model_dir = os.path.join(base_dir, "model")
+    results_dir = os.path.join(base_dir, "results")
+    os.makedirs(model_dir, exist_ok=True)
+    os.makedirs(results_dir, exist_ok=True)
 
     net = nn.Sequential(
         nn.Flatten(),
@@ -125,12 +130,11 @@ def run_train(
         if val_loss < min_val_loss:
             min_val_loss = val_loss
             n_stop = 0
-            os.makedirs("./model", exist_ok=True)
-            save_relative_path = "./model/mnist_nn.pth"
-            torch.save(net, save_relative_path)
+            save_path = os.path.join(model_dir, "mnist_nn.pth")
+            torch.save(net, save_path)
             print(
                 f"\nSaved the current best model to "
-                + f"{os.path.abspath(save_relative_path)} for [Epoch {epoch + 1}]"
+                + f"{os.path.abspath(save_path)} for [Epoch {epoch + 1}]"
             )
         else:
             n_stop += 1
@@ -140,7 +144,6 @@ def run_train(
     train_losses, val_losses = np.array(train_losses), np.array(val_losses)
 
     if save_losses:
-        os.makedirs("./results", exist_ok=True)
         plt.plot(range(1, nb_epoch_eff + 1), val_losses, label="validation set loss")
         plt.plot(
             range(1, nb_epoch_eff + 1),
@@ -151,9 +154,9 @@ def run_train(
         plt.xlabel("Epoch")
         plt.ylabel("Loss")
         plt.legend()
-        save_relative_path = "./results/losses.png"
-        plt.savefig(save_relative_path)
-        print(f"Saved the losses to {os.path.abspath(save_relative_path)}")
+        save_path = os.path.join(results_dir, "losses.png")
+        plt.savefig(save_path)
+        print(f"Saved the losses to {os.path.abspath(save_path)}")
 
     return train_losses, val_losses
 
@@ -166,6 +169,9 @@ def run_predict() -> None:
     Returns:
         None
     """
+    base_dir = os.path.dirname(__file__)
+    model_dir = os.path.join(base_dir, "model")
+    results_dir = os.path.join(base_dir, "results")
 
     print("\n")
     print(" Loading the test set and the final model ".center(100, "#"))
@@ -176,7 +182,7 @@ def run_predict() -> None:
     test_loader = torch.utils.data.DataLoader(
         test_set, batch_size=1, shuffle=False, num_workers=4
     )
-    best_net = torch.load("./model/mnist_nn.pth")
+    best_net = torch.load(os.path.join(model_dir, "mnist_nn.pth"))
     print(" OK ".center(10, "*"))
 
     print("\n")
@@ -191,7 +197,7 @@ def run_predict() -> None:
 
     print("\n")
     print(" Writing the predictions ".center(100, "#"))
-    with open("./results/predictions.txt", "w", encoding="utf8") as file:
+    with open(os.path.join(results_dir, "predictions.txt"), "w", encoding="utf8") as file:
         for i, pred in enumerate(predictions):
             if i <= len(predictions) - 2:
                 file.write(f"{i+1},{pred}" + "\n")
