@@ -170,13 +170,14 @@ def run_predict() -> None:
         None
     """
     base_dir = os.path.dirname(__file__)
+    data_dir = os.path.join(base_dir, "data")
     model_dir = os.path.join(base_dir, "model")
     results_dir = os.path.join(base_dir, "results")
 
     print("\n")
     print(" Loading the test set and the final model ".center(100, "#"))
     test_set = datasets.MNIST(
-        root="./data", train=False, download=True, transform=transforms.ToTensor()
+        root=data_dir, train=False, download=True, transform=transforms.ToTensor()
     )
     n_test = len(test_set)
     test_loader = torch.utils.data.DataLoader(
