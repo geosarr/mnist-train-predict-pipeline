@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import os
 
@@ -47,3 +49,7 @@ def prediction(run: bool):
             filename="predictions.txt",
             media_type="text/plain",
         )
+
+
+if __name__ == "__main__":
+    os.popen("uvicorn main:app --reload --port 8000").read()
