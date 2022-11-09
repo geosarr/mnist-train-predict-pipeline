@@ -1,13 +1,15 @@
+#!/usr/bin/env python
+
 from tap import Tap
 from utils import run_train, load_dataset
 
 
 class ArgumentParser(Tap):
     n_train: int  # size of the training set
-    batch_size: int  # size of a batch
-    n_epochs: int  # number of epochs to consider for training
-    n_early_stop: int  # maximum number of consecutive epochs to consider for early stopping
-    save_losses: bool  # whether or not to save the validation and training set losses
+    batch_size: int=64  # size of a batch
+    n_epochs: int=10  # number of epochs to consider for training
+    n_early_stop: int=3  # maximum number of consecutive epochs to consider for early stopping
+    save_losses: bool=True  # whether or not to save the validation and training set losses
 
 
 def train():
