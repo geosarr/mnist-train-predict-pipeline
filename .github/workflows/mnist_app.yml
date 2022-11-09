@@ -21,3 +21,21 @@ jobs:
     - name: Format code
       run: |
         make format
+  
+  build-container:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Loging to Github registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.BUILDCONTAINERS }}
+    - name: build FastAPI
+      uses: docker/build-push-action@v2
+      with:
+        context: ./
+        tags: ghcr.io/geosarr/mnist-ml-pipeline:latest
+        push: true
+    
