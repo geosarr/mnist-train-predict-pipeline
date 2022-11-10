@@ -13,9 +13,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip &&\
     pip install --no-cache-dir --trusted-host pypi.python.org -r requirements.txt
 
-# Exposing a port 
-EXPOSE 8080
-
 # Copy necessary files/folder to working directory
 COPY train.py .
 COPY predict.py .
@@ -24,5 +21,4 @@ COPY utils.py .
 COPY app /ml_pipeline/app
 
 # Launching the API
-WORKDIR /ml_pipeline/app
-CMD ["uvicorn", "main:app", "--reload", "--port", "8080"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
