@@ -18,6 +18,8 @@ COPY train.py .
 COPY predict.py .
 COPY config.py .
 COPY utils.py .
+COPY iam.py .
+COPY .env .
 COPY app /ml_pipeline/app
 
 # Launching the API

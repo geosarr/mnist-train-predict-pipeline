@@ -7,8 +7,11 @@ from torchvision import transforms
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
-from config import N_CLASSES
+from config import N_CLASSES, DATA_DIR, MODEL_DIR, RESULTS_DIR
 
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(MODEL_DIR, exist_ok=True)
+os.makedirs(RESULTS_DIR, exist_ok=True)
 
 def load_dataset(
     n_train: int, batch_size: int
@@ -26,10 +29,9 @@ def load_dataset(
 
     print("\n")
     print(" Loading training and validation sets ".center(100, "#"))
-    data_dir = os.path.join(os.path.dirname(__file__), "data")
-    os.makedirs(data_dir, exist_ok=True)
+    
     train_set = datasets.MNIST(
-        root=data_dir, train=True, download=True, transform=transforms.ToTensor()
+        root=DATA_DIR, train=True, download=True, transform=transforms.ToTensor()
     )
 
     print(f"Number of training instances {n_train}")
@@ -80,11 +82,6 @@ def run_train(
     val_losses = []
     train_losses = []
     x_val, y_val = next(iter(val_loader))
-    base_dir = os.path.dirname(__file__)
-    model_dir = os.path.join(base_dir, "model")
-    results_dir = os.path.join(base_dir, "results")
-    os.makedirs(model_dir, exist_ok=True)
-    os.makedirs(results_dir, exist_ok=True)
 
     net = nn.Sequential(
         nn.Flatten(),
@@ -130,7 +127,7 @@ def run_train(
         if val_loss < min_val_loss:
             min_val_loss = val_loss
             n_stop = 0
-            save_path = os.path.join(model_dir, "mnist_nn.pth")
+            save_path = os.path.join(MODEL_DIR, "mnist_nn.pth")
             torch.save(net, save_path)
             print(
                 f"\nSaved the current best model to "
@@ -154,7 +151,7 @@ def run_train(
         plt.xlabel("Epoch")
         plt.ylabel("Loss")
         plt.legend()
-        save_path = os.path.join(results_dir, "losses.png")
+        save_path = os.path.join(RESULTS_DIR, "losses.png")
         plt.savefig(save_path)
         print(f"Saved the losses to {os.path.abspath(save_path)}")
 
@@ -169,21 +166,16 @@ def run_predict() -> None:
     Returns:
         None
     """
-    base_dir = os.path.dirname(__file__)
-    data_dir = os.path.join(base_dir, "data")
-    model_dir = os.path.join(base_dir, "model")
-    results_dir = os.path.join(base_dir, "results")
-
     print("\n")
     print(" Loading the test set and the final model ".center(100, "#"))
     test_set = datasets.MNIST(
-        root=data_dir, train=False, download=True, transform=transforms.ToTensor()
+        root=DATA_DIR, train=False, download=True, transform=transforms.ToTensor()
     )
     n_test = len(test_set)
     test_loader = torch.utils.data.DataLoader(
         test_set, batch_size=1, shuffle=False, num_workers=4
     )
-    best_net = torch.load(os.path.join(model_dir, "mnist_nn.pth"))
+    best_net = torch.load(os.path.join(MODEL_DIR, "mnist_nn.pth"))
     print(" OK ".center(10, "*"))
 
     print("\n")
@@ -198,7 +190,9 @@ def run_predict() -> None:
 
     print("\n")
     print(" Writing the predictions ".center(100, "#"))
-    with open(os.path.join(results_dir, "predictions.txt"), "w", encoding="utf8") as file:
+    with open(
+        os.path.join(RESULTS_DIR, "predictions.txt"), "w", encoding="utf8"
+    ) as file:
         for i, pred in enumerate(predictions):
             if i <= len(predictions) - 2:
                 file.write(f"{i+1},{pred}" + "\n")

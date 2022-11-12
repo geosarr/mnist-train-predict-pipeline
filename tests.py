@@ -1,5 +1,5 @@
 import unittest
-from utils import *
+from utils import load_dataset
 
 
 class TestUtils(unittest.TestCase):
