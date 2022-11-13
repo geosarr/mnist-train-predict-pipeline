@@ -93,7 +93,8 @@ def create_data_user_database() -> None:
 
         cur.execute(
             """INSERT INTO users VALUES
-                    ("johndoe","$2b$12$4FdZ1IT6QarM5CyQ7DEx.e/pwLQQGBpVQLgWVyMs3DnkAHTCOys6W")"""
+                    ("johndoe","$2b$12$4FdZ1IT6QarM5CyQ7DEx.e/pwLQQGBpVQLgWVyMs3DnkAHTCOys6W"),
+                    ("alice", "$2b$12$UqWFgNQXSGDFsQs6fnHjTeCcPfa1eSGGVrBSpgk4/X/s/aaN/O6Hy")"""
         )
 
         con.commit()
