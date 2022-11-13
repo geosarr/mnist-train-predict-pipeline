@@ -14,8 +14,6 @@ RUN pip install --no-cache-dir --upgrade pip &&\
     pip install --no-cache-dir --trusted-host pypi.python.org -r requirements.txt
 
 # Copy necessary files/folder to working directory
-COPY train.py .
-COPY predict.py .
 COPY config.py .
 COPY utils.py .
 COPY iam.py .
