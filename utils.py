@@ -13,6 +13,7 @@ os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(MODEL_DIR, exist_ok=True)
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
+
 def load_dataset(
     n_train: int, batch_size: int
 ) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
@@ -29,7 +30,7 @@ def load_dataset(
 
     print("\n")
     print(" Loading training and validation sets ".center(100, "#"))
-    
+
     train_set = datasets.MNIST(
         root=DATA_DIR, train=True, download=True, transform=transforms.ToTensor()
     )

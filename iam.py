@@ -8,7 +8,7 @@ from jose import JWTError, jwt
 from jose.exceptions import ExpiredSignatureError
 import sqlite3 as sql
 from config import DATA_DIR, PWD_CONTEXT, SECRET_KEY, ALGORITHM, OAUTH2_SCHEME
-from config import  CREDENTIALS_EXCEPTION, EXPIRATION_EXCEPTION, SCOPE_EXCEPTION
+from config import CREDENTIALS_EXCEPTION, EXPIRATION_EXCEPTION, SCOPE_EXCEPTION
 
 
 class User(BaseModel):
@@ -37,12 +37,9 @@ def get_user(cursor: sql.Cursor, username: str) -> Union[UserInDB, None]:
     ).fetchall()
     if len(db_user) == 1:
         db_user = {
-            "username": db_user[0][0], 
+            "username": db_user[0][0],
             "hashed_password": db_user[0][1],
-            "scopes": {
-                "training": db_user[0][2],
-                "prediction": db_user[0][3]
-            }        
+            "scopes": {"training": db_user[0][2], "prediction": db_user[0][3]},
         }
         return UserInDB(**db_user)
 

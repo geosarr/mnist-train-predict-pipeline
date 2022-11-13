@@ -16,8 +16,7 @@ RESULTS_DIR = os.path.join(BASE_DIR, "results")
 
 # Password/Scopes flow
 OAUTH2_SCHEME = OAuth2PasswordBearer(
-    tokenUrl="token",
-    scopes={"training": "run", "prediction": "run"}
+    tokenUrl="token", scopes={"training": "run", "prediction": "run"}
 )
 
 # Password management
@@ -50,7 +49,7 @@ SCOPE_EXCEPTION = HTTPException(
     detail="No permission",
     headers={"WWW-Authenticate": "Bearer"},
 )
-MODEL_EXCEPTION =  HTTPException(
+MODEL_EXCEPTION = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail="Model not found",
     headers={"WWW-Authenticate": "Bearer"},
