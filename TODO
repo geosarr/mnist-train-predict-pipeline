@@ -1,2 +1,11 @@
-update environment.yml
+- test the environment without bcrypt in the requirements.txt file
+- test the Docker
+- update environment.yml
+- add api tests
+- Forbid many connections of the same user
+- Raise Error for prediction without model (exemple new docker)
+- Find a way to give possibility to a user to mute some scopes.
+- Add logs to a folder
+- check data concurrency problem when many users use request the same endpoint
+- include scopes for training and prediction endpoints
 
