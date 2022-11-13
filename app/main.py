@@ -6,10 +6,11 @@ from typing import Union
 from datetime import timedelta
 import sqlite3 as sql
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Request
 from fastapi.security import  OAuth2PasswordRequestForm
-from fastapi.responses import FileResponse
-
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 one_level_up = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(one_level_up)
 from utils import run_train, load_dataset, run_predict
@@ -22,7 +23,21 @@ data_base_path = os.path.join(one_level_up, "data", "users.db")
 cursor = sql.connect(data_base_path).cursor()
 
 app = FastAPI()
+app.mount(
+    "/static", 
+    StaticFiles(directory=os.path.join(one_level_up,"app","static")), 
+    name="static"
+)
 
+
+templates = Jinja2Templates(
+    directory=os.path.join(one_level_up,"app", "templates")
+)
+
+@app.get("/", response_class=HTMLResponse)
+def welcome(request: Request):
+    # return {"message": "Hello welcome to this FastAPI"}
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/token")
 async def login_with_username_password(form_data: OAuth2PasswordRequestForm = Depends()):
