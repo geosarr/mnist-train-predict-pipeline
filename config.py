@@ -14,30 +14,44 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 MODEL_DIR = os.path.join(BASE_DIR, "model")
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
 
-# Password flow
+# Password/Scopes flow
 OAUTH2_SCHEME = OAuth2PasswordBearer(
     tokenUrl="token",
-    scopes={"training": "Run", "predicting": "Run"}
+    scopes={"training": "run", "prediction": "run"}
 )
 
 # Password management
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# API Token generation parameters
+# API token generation parameters
 load_dotenv()
 SECRET_KEY = os.environ["JWT_SECRET_KEY"]
 ALGORITHM = os.environ["JWT_SIG_ALGORITHM"]
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ["JWT_DURATION_MINUTES"])
 
 # Exceptions
+USER_PWD_EXCEPTION = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Incorrect username or password",
+    headers={"WWW-Authenticate": "Bearer"},
+)
 CREDENTIALS_EXCEPTION = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Could not validate credentials",
     headers={"WWW-Authenticate": "Bearer"},
 )
-
 EXPIRATION_EXCEPTION = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Expired token",
+    headers={"WWW-Authenticate": "Bearer"},
+)
+SCOPE_EXCEPTION = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="No permission",
+    headers={"WWW-Authenticate": "Bearer"},
+)
+MODEL_EXCEPTION =  HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="Model not found",
     headers={"WWW-Authenticate": "Bearer"},
 )
