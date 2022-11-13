@@ -15,7 +15,10 @@ MODEL_DIR = os.path.join(BASE_DIR, "model")
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
 
 # Password flow
-OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
+OAUTH2_SCHEME = OAuth2PasswordBearer(
+    tokenUrl="token",
+    scopes={"training": "Run", "predicting": "Run"}
+)
 
 # Password management
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
