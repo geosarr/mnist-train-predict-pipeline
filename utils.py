@@ -7,7 +7,7 @@ from torchvision import transforms
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
-from config import N_CLASSES, DATA_DIR, MODEL_DIR, RESULTS_DIR
+from config import N_CLASSES, DATA_DIR, MODEL_DIR, RESULTS_DIR, MODEL_EXCEPTION
 
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(MODEL_DIR, exist_ok=True)
@@ -166,6 +166,9 @@ def run_predict() -> None:
     Returns:
         None
     """
+    model_path = os.path.join(MODEL_DIR, "mnist_nn.pth")
+    if not os.path.isfile(model_path):
+        raise MODEL_EXCEPTION
     print("\n")
     print(" Loading the test set and the final model ".center(100, "#"))
     test_set = datasets.MNIST(
