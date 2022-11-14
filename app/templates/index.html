@@ -1,0 +1,31 @@
+<html>
+<head>
+    <title>MNIST-TRAIN-PREDICT</title>
+    <center>
+        <h1>WELCOME !!!</h1>
+    </center>
+    <link href="{{ url_for('static', path='/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <h3>
+        This is a FastAPI application that exposes two endpoints to train and predict the classical MNIST dataset with
+        a MultiLayer Perceptron.
+    </h3>
+    <br></br>
+    <h3>
+        It supports token generation after authentification, <b>each token expires after 5 minutes</b>. 
+        They have to be renewed to access the ressources. An authentification is done using a username and a password. 
+    </h3>
+    <br></br>
+    <h3>
+        There are only two users John Doe (with username: johndoe and password: very_secret) and Alice 
+        (with username: alice, I let you imagine the password of Alice). John Doe can only run predictions 
+        but cannot train a model, only Alice can do both. There are two scopes to handle the permissions:
+        "training:run" and "prediction:run", Alice has both but John has only the latter.
+    </h3>
+    <br></br>
+    <h3>
+        You can interact with the API by going to the /docs path of present URL.
+    </h3>
+</body>
+</html>

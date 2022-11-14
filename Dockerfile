@@ -1,21 +1,24 @@
-# Pulling miniconda3 image
-FROM continuumio/miniconda3
+FROM python:3.9.13-slim-buster
 
-# Setting the working directory
+# Working directory
 WORKDIR /ml_pipeline
 
-# Copying all necessary files to the working directory
-COPY train.py .
-COPY predict.py .
+# Setting up a virtualenv and its PATH
+ENV VIRTUAL_ENV=/ml_pipeline/mnist_env
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Install packages from requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip &&\
+    pip install --no-cache-dir --trusted-host pypi.python.org -r requirements.txt
+
+# Copy necessary files/folder to working directory
 COPY config.py .
 COPY utils.py .
+COPY iam.py .
+COPY .env .
+COPY app /ml_pipeline/app
 
-# Creating the python environment
-COPY environment.yml .
-RUN conda env create -f environment.yml
-
-# Activating the environment
-SHELL ["conda", "run", "-n", "mnist_env", "/bin/bash", "-c"]
-
-# Training the model and predicting in the environment
-CMD python train.py --n_train 40000 --batch_size 128 --n_epochs 10 --n_early_stop 2 --save_losses && python predict.py 
+# Launching the API
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
