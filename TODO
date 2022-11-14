@@ -1,6 +1,5 @@
 - test the environment without bcrypt in the requirements.txt file
 - test the Docker
-- update environment.yml
 - add api tests
 - Forbid many connections of the same user
 - Raise Error for prediction without model (exemple new docker)
