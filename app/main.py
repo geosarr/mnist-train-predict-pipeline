@@ -25,7 +25,6 @@ from iam import (
 
 fake_data_db = create_data_user_database()
 data_base_path = os.path.join(one_level_up, "data", "users.db")
-cursor = sql.connect(data_base_path).cursor()
 
 app = FastAPI()
 app.mount(
@@ -46,7 +45,8 @@ def welcome(request: Request):
 @app.post("/token")
 async def login_with_username_password(
     form_data: OAuth2PasswordRequestForm = Depends(),
-):
+):  
+    cursor = sql.connect(data_base_path).cursor()
     user = authenticate_user(cursor, form_data.username, form_data.password)
     if not user:
         raise USER_PWD_EXCEPTION
