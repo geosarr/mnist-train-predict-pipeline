@@ -1,14 +1,21 @@
 import os
-from typing import Union
+from typing import Union, List
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 
-from fastapi import Depends
+from fastapi import Depends, status, HTTPException
 from jose import JWTError, jwt
 from jose.exceptions import ExpiredSignatureError
 import sqlite3 as sql
-from config import DATA_DIR, PWD_CONTEXT, SECRET_KEY, ALGORITHM, OAUTH2_SCHEME
-from config import CREDENTIALS_EXCEPTION, EXPIRATION_EXCEPTION, SCOPE_EXCEPTION
+from config import (
+    DATA_DIR,
+    PWD_CONTEXT,
+    SECRET_KEY,
+    ALGORITHM,
+    OAUTH2_SCHEME,
+    CREDENTIALS_EXCEPTION,
+    EXPIRATION_EXCEPTION,
+)
 
 
 class User(BaseModel):
@@ -20,7 +27,7 @@ class User(BaseModel):
 
 class UserInDB(User):
     hashed_password: str
-    scopes: dict
+    scopes: List[str]
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -39,7 +46,10 @@ def get_user(cursor: sql.Cursor, username: str) -> Union[UserInDB, None]:
         db_user = {
             "username": db_user[0][0],
             "hashed_password": db_user[0][1],
-            "scopes": {"training": db_user[0][2], "prediction": db_user[0][3]},
+            "scopes": [
+                f"training:{db_user[0][2].strip()}",
+                f"prediction:{db_user[0][3].strip()}",
+            ],
         }
         return UserInDB(**db_user)
 
@@ -71,8 +81,13 @@ def is_valid_token(endpoint: str, token: str = Depends(OAUTH2_SCHEME)) -> bool:
         scopes: dict = payload.get("scopes")
         if username is None:
             raise CREDENTIALS_EXCEPTION
-        if scopes[endpoint] != "run":
-            raise SCOPE_EXCEPTION
+        good_scope = f"{endpoint}:run"
+        if good_scope not in scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"No scope {good_scope} for current user, if the user has the required scope, they can ask for a token with the {good_scope} scope",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
     except ExpiredSignatureError as exc1:
         raise EXPIRATION_EXCEPTION from exc1
     except JWTError as exc2:
