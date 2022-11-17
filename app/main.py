@@ -62,7 +62,6 @@ async def login_with_username_password(
             scope_info = scope.strip().split(":")
             if len(scope_info) != 2:
                 # format should be for e.g training:run
-                print(scope_info)
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Bad scope {scope}, should be of the form endpoint_name:permission, e.g. training:run",
