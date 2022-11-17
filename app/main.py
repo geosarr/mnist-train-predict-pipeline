@@ -5,7 +5,7 @@ import os
 from datetime import timedelta
 import sqlite3 as sql
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -14,7 +14,12 @@ from fastapi.staticfiles import StaticFiles
 one_level_up = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(one_level_up)
 from utils import run_train, load_dataset, run_predict
-from config import OAUTH2_SCHEME, ACCESS_TOKEN_EXPIRE_MINUTES, USER_PWD_EXCEPTION
+from config import (
+    OAUTH2_SCHEME,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    USER_PWD_EXCEPTION,
+    ENDPOINTS,
+)
 from iam import (
     create_data_user_database,
     authenticate_user,
@@ -45,14 +50,48 @@ def welcome(request: Request):
 @app.post("/token")
 async def login_with_username_password(
     form_data: OAuth2PasswordRequestForm = Depends(),
-):  
+):
     cursor = sql.connect(data_base_path).cursor()
     user = authenticate_user(cursor, form_data.username, form_data.password)
     if not user:
         raise USER_PWD_EXCEPTION
+    if len(form_data.scopes) > 0:
+        # user inputs scopes: check first format of scopes and finally check permissions
+        final_scopes = []
+        for scope in form_data.scopes:
+            scope_info = scope.strip().split(":")
+            if len(scope_info) != 2:
+                # format should be for e.g training:run
+                print(scope_info)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Bad scope {scope}, should be of the form endpoint_name:permission, e.g. training:run",
+                )
+            elif scope_info[0] not in ENDPOINTS:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Bad scope {scope}, the only available endpoints are {OAUTH2_SCHEME.scopes}, instead of {scope_info[0]}",
+                )
+            elif scope_info[1] != "run":
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Bad scope {scope}, the only available permission is run instead of {scope_info[1]}",
+                )
+            else:
+                # check whether or not the user has this permission
+                if scope.strip() not in user.scopes:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail=f"No scope {scope} for user",
+                        headers={"WWW-Authenticate": "Bearer"},
+                    )
+            final_scopes.append(scope)
+    else:
+        # If the user does not specify scopes, the hard-coded ones in the user database will be used
+        final_scopes = user.scopes
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username, "scopes": user.scopes},
+        data={"sub": user.username, "scopes": final_scopes},
         expires_delta=access_token_expires,
     )
     return {"access_token": access_token, "token_type": "bearer"}
