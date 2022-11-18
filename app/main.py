@@ -69,7 +69,7 @@ async def login_with_username_password(
             elif scope_info[0] not in ENDPOINTS:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Bad scope {scope}, the only available endpoints are {OAUTH2_SCHEME.scopes}, instead of {scope_info[0]}",
+                    detail=f"Bad scope {scope}, the only available endpoints are {ENDPOINTS}, instead of {scope_info[0]}",
                 )
             elif scope_info[1] != "run":
                 raise HTTPException(
