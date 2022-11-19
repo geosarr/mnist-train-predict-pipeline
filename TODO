@@ -1,6 +1,0 @@
-- test the Docker
-- add api tests for the remaining endpoints
-- Forbid many connections of the same user
-- Add logs to a folder
-- check data concurrency problem when many users request the same endpoint
-
